@@ -12,10 +12,6 @@ path_model = './models'
 file_model = random.choice(os.listdir("./models/"))
 template = cv.imread(os.path.join(path_model,file_model))
 
-# Load template and figure
-# figure = cv.imread('./neia.jpg')
-# template = cv.imread('./3098_green.png')
-
 figure = cv.resize(figure, (template.shape[1], template.shape[0]))
 
 # Set blank image
@@ -34,28 +30,25 @@ mask_inv = cv.bitwise_not(mask)
 contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 contour = np.zeros((mask.shape[0], mask.shape[1]), np.uint8)
 cv.drawContours(contour, contours, 0, (255, 255, 255), 3)
-x,y,w,h = cv.boundingRect(contour)
-largura = w
-altura = h
 
-resized = cv.resize(figure, [largura, altura])
+# Find the size of the green box
+x,y,w,h = cv.boundingRect(contour)
+widht = w
+height = h
+
+# Resize the figure to box size
+resized = cv.resize(figure, [widht, height])
 
 # Overlay blank image
-print('Resized tamanho =', resized.shape[1], resized.shape[0])
-print('Coordenadas do resized =', x, x+w, y, y+h)
-print('Template tamanho =', template.shape[1], template.shape[0])
 blank[y:y+h, x:x+w] = resized
-cv.imwrite('./blank.png', blank)
-print('template\n', template, '\nresized\n', resized)
-# apply the mask to the foreground image
+
+# Apply the mask to the figure image
 figure_masked = cv.bitwise_and(blank, blank, mask=mask)
 
-# apply the inverted mask to the background image
+# Apply the inverted mask to the template image
 template_masked = cv.bitwise_and(template, template, mask=mask_inv)
 
-cv.imwrite('./contour.png', contour)
-
-# combine the masked foreground and background images
+# combine the masked figure and template images
 result = cv.add(template_masked, figure_masked)
 cv.imwrite('./result.png', result)
 cv.waitKey(0)
