@@ -1,12 +1,40 @@
 import cv2 as cv
+import sys
 import numpy as np
 import random
+import getopt
 import os
+
+def getScriptArguments(argv):
+    global set_figure
+    arg_help = 'Comando incorreto.'
+    
+    try:
+        opts, args = getopt.getopt(argv[1:], 'f:', ['figure'])
+    except:
+        print(arg_help) 
+        sys.exit(2)
+    
+    # Treat script arguments
+    for opt, arg in opts:
+        if opt in ('-f', '--figure'):
+            set_figure = arg
+            if(os.path.exists(os.path.join('./',set_figure)) == False):
+                print(f'Arquivo {set_figure} não existe!')
+                quit()
+
+set_figure = ''
+if __name__ == "__main__":
+    getScriptArguments(sys.argv)
 
 # Load template and figure
 path_figure = './figures'
-file = random.choice(os.listdir("./figures/"))
-figure = cv.imread(os.path.join(path_figure,file))
+if set_figure == '':
+    file = random.choice(os.listdir("./figures/"))
+    figure = cv.imread(os.path.join(path_figure,file))
+else:
+    file = set_figure
+    figure = cv.imread(file)
 
 path_model = './models'
 file_model = random.choice(os.listdir("./models/"))
