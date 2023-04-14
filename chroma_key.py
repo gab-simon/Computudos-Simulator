@@ -7,10 +7,11 @@ import os
 
 def getScriptArguments(argv):
     global set_figure
+    global set_model
     arg_help = 'Comando incorreto.'
     
     try:
-        opts, args = getopt.getopt(argv[1:], 'f:', ['figure'])
+        opts, args = getopt.getopt(argv[1:], 'f:t:', ['figure', 'template'])
     except:
         print(arg_help) 
         sys.exit(2)
@@ -22,24 +23,35 @@ def getScriptArguments(argv):
             if(os.path.exists(os.path.join('./',set_figure)) == False):
                 print(f'Arquivo {set_figure} não existe!')
                 quit()
+        if opt in ('-t', '--template'):
+            set_model = arg
+            if(os.path.exists(os.path.join('./',set_model)) == False):
+                print(f'Arquivo {set_figure} não existe!')
+                quit()
 
 set_figure = ''
+set_model = ''
+path_model = './models'
+path_figure = './figures'
+
 if __name__ == "__main__":
     getScriptArguments(sys.argv)
 
 # Load template and figure
-path_figure = './figures'
 if set_figure == '':
     file = random.choice(os.listdir("./figures/"))
     figure = cv.imread(os.path.join(path_figure,file))
 else:
     file = set_figure
     figure = cv.imread(file)
+if set_model == '':
+    file_model = random.choice(os.listdir("./models/"))
+    template = cv.imread(os.path.join(path_model, file_model))
+else:
+    file_model = set_model
+    template = cv.imread(file_model)
 
-path_model = './models'
-file_model = random.choice(os.listdir("./models/"))
-template = cv.imread(os.path.join(path_model,file_model))
-
+# Resize figure for image operations
 figure = cv.resize(figure, (template.shape[1], template.shape[0]))
 
 # Set blank image
